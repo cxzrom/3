@@ -100,8 +100,9 @@
         }
 
         function sendDataToGoogleSheets(name, article, quantity, isAdding) {
-            const scriptURL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxp89ql-TvKYVxN8iUfHEWFftdNTnVLoGY9tHFuT5argILu5fd1JvAPFJmH7j7MQcpz/exec/exec';
-            const data = new FormData();data.append('name', name);
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzaSO-bAWwA86LM5AJolu_ciwV_2_tqmZqOhykro5Mrqi_6HTywpFLcRBqb1glfzs3i/exec';
+            const data = new FormData();
+            data.append('name', name);
             data.append('article', article);
             data.append('quantity', isAdding ? quantity : -quantity);
 
