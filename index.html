@@ -91,7 +91,7 @@
     function handleQrCodeResult(qrCodeMessage) {
         const [productName, productArticle] = qrCodeMessage.split(';');
         document.getElementById('product-name').textContent = `Назва: ${productName}`;
-        document.getElementById('product-article').textContent = `Артикул: ${productArticle}`;
+document.getElementById('product-article').textContent = `Артикул: ${productArticle}`;
         document.getElementById('product-form').style.display = 'flex';
         document.getElementById('confirm-btn').onclick = function() {
             const quantity = parseInt(document.getElementById('product-quantity').value, 10);
