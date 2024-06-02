@@ -14,11 +14,12 @@
             height: 100vh;
             margin: 0;
         }
-        button {
+        button, input[type="file"] {
             padding: 20px 40px;
             font-size: 18px;
             margin: 10px;
             cursor: pointer;
+            display: block;
         }
         .green {
             background-color: green;
@@ -30,10 +31,26 @@
             color: white;
             border: none;
         }
+        .file-input {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <button class="green" onclick="alert('Товар додано')">Додати товар</button>
-    <button class="red" onclick="alert('Товар повернуто')">Повернути товар</button>
+    <label for="add-product" class="green">Додати товар</label>
+    <input type="file" id="add-product" class="file-input" accept="image/*" capture="camera">
+    
+    <label for="return-product" class="red">Повернути товар</label>
+    <input type="file" id="return-product" class="file-input" accept="image/*" capture="camera">
+    
+    <script>
+        document.getElementById('add-product').addEventListener('change', function() {
+            alert('Товар додано');
+        });
+
+        document.getElementById('return-product').addEventListener('change', function() {
+            alert('Товар повернуто');
+        });
+    </script>
 </body>
 </html>
