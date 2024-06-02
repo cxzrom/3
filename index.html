@@ -32,31 +32,89 @@
         .file-input {
             display: none;
         }
+        #qr-reader {
+            display: none;
+        }
+        #product-form {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #product-form input {
+            margin: 5px;
+        }
     </style>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
     <button class="green" id="add-product-btn">Додати товар</button>
-    <input type="file" id="add-product" class="file-input" accept="image/*" capture="environment">
-    
     <button class="red" id="return-product-btn">Повернути товар</button>
-    <input type="file" id="return-product" class="file-input" accept="image/*" capture="environment">
     
+    <div id="qr-reader"></div>
+    <div id="product-form">
+        <p id="product-name"></p>
+        <p id="product-article"></p>
+        <input type="number" id="product-quantity" placeholder="Кількість">
+        <button id="confirm-btn">Підтвердити</button>
+    </div>
+
     <script>
         document.getElementById('add-product-btn').addEventListener('click', function() {
-            document.getElementById('add-product').click();
+            startQrReader(true);
         });
 
         document.getElementById('return-product-btn').addEventListener('click', function() {
-            document.getElementById('return-product').click();
+            startQrReader(false);
         });
 
-        document.getElementById('add-product').addEventListener('change', function() {
-            alert('Товар додано');
-        });
+        function startQrReader(isAdding) {
+            document.getElementById('qr-reader').style.display = 'block';
+            const html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+                (qrCodeMessage) => {
+                    html5QrCode.stop();
+                    handleQrCodeResult(qrCodeMessage, isAdding);
+                },
+                (errorMessage) => {
+                    // Handle error
+                })
+                .catch((err) => {
+                    // Start failed
+                });
+        }
 
-        document.getElementById('return-product').addEventListener('change', function() {
-            alert('Товар повернуто');
-        });
+        function handleQrCodeResult(qrCodeMessage, isAdding) {
+            const [productName, productArticle] = qrCodeMessage.split(';');
+            document.getElementById('product-name').textContent = `Назва: ${productName}`;
+            document.getElementById('product-article').textContent = `Артикул: ${productArticle}`;
+            document.getElementById('product-form').style.display = 'flex';
+            document.getElementById('confirm-btn').onclick = function() {
+                const quantity = parseInt(document.getElementById('product-quantity').value, 10);
+                sendDataToGoogleSheets(productName, productArticle, quantity, isAdding);
+            };
+        }
+
+        function sendDataToGoogleSheets(name, article, quantity, isAdding) {
+            const scriptURL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxp89ql-TvKYVxN8iUfHEWFftdNTnVLoGY9tHFuT5argILu5fd1JvAPFJmH7j7MQcpz/exec/exec';
+            const data = new FormData();data.append('name', name);
+            data.append('article', article);
+            data.append('quantity', isAdding ? quantity : -quantity);
+
+            fetch(scriptURL, { method: 'POST', body: data })
+                .then(response => response.json())
+                .then(result => {
+                    alert('Дані успішно надіслано!');
+                    document.getElementById('product-form').style.display = 'none';
+                })
+                .catch(error => {
+                    alert('Помилка при відправці даних.');
+                });
+        }
     </script>
 </body>
 </html>
