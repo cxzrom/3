@@ -109,8 +109,8 @@
             fetch(scriptURL, { method: 'POST', body: data })
                 .then(response => response.json())
                 .then(result => {
-                    alert('Дані успішно надіслано!');
-                    document.getElementById('product-form').style.display = 'none';
+                    alert('Дані успішно надіслано!');document.getElementById('product-form').style.display = 'none';
+                    document.getElementById('qr-reader').style.display = 'none';
                 })
                 .catch(error => {
                     alert('Помилка при відправці даних.');
