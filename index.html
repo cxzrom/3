@@ -59,63 +59,61 @@
     </div>
 
     <script>
-        document.getElementById('add-product-btn').addEventListener('click', function() {
-            startQrReader(true);
-        });
+    document.getElementById('add-product-btn').addEventListener('click', function() {
+        startQrReader();
+    });
 
-        document.getElementById('return-product-btn').addEventListener('click', function() {
-            startQrReader(false);
-        });
+    document.getElementById('return-product-btn').addEventListener('click', function() {
+        startQrReader();
+    });
 
-        function startQrReader(isAdding) {
-            document.getElementById('qr-reader').style.display = 'block';
-            const html5QrCode = new Html5Qrcode("qr-reader");
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
-                (qrCodeMessage) => {
-                    html5QrCode.stop();
-                    handleQrCodeResult(qrCodeMessage, isAdding);
-                },
-                (errorMessage) => {
-                    // Handle error
-                })
-                .catch((err) => {
-                    // Start failed
-                });
-        }
+    function startQrReader() {
+        document.getElementById('qr-reader').style.display = 'block';
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            {
+                fps: 10,
+                qrbox: 250
+            },
+            (qrCodeMessage) => {
+                html5QrCode.stop();
+                handleQrCodeResult(qrCodeMessage);
+            },
+            (errorMessage) => {
+                // Handle error
+            })
+            .catch((err) => {
+                // Start failed
+            });
+    }
 
-        function handleQrCodeResult(qrCodeMessage, isAdding) {
-            const [productName, productArticle] = qrCodeMessage.split(';');
-            document.getElementById('product-name').textContent = `Назва: ${productName}`;
-            document.getElementById('product-article').textContent = `Артикул: ${productArticle}`;
-            document.getElementById('product-form').style.display = 'flex';
-            document.getElementById('confirm-btn').onclick = function() {
-                const quantity = parseInt(document.getElementById('product-quantity').value, 10);
-                sendDataToGoogleSheets(productName, productArticle, quantity, isAdding);
-            };
-        }
+    function handleQrCodeResult(qrCodeMessage) {
+        const [productName, productArticle] = qrCodeMessage.split(';');
+        document.getElementById('product-name').textContent = `Назва: ${productName}`;
+        document.getElementById('product-article').textContent = `Артикул: ${productArticle}`;
+        document.getElementById('product-form').style.display = 'flex';
+        document.getElementById('confirm-btn').onclick = function() {
+            const quantity = parseInt(document.getElementById('product-quantity').value, 10);
+            sendDataToGoogleSheets(productName, productArticle, quantity);
+        };
+    }
 
-        function sendDataToGoogleSheets(name, article, quantity, isAdding) {
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzaSO-bAWwA86LM5AJolu_ciwV_2_tqmZqOhykro5Mrqi_6HTywpFLcRBqb1glfzs3i/exec';
-            const data = new FormData();
-            data.append('name', name);
-            data.append('article', article);
-            data.append('quantity', isAdding ? quantity : -quantity);
+    function sendDataToGoogleSheets(name, article, quantity) {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbw-31sJxooqukyOH-u4nmlIB3SLn0Cq_0IGRgLVFGbc98TKjADxQj3BB6AOsLwJEGu1/exec';
+        const data = new FormData();
+        data.append('name', name);
+        data.append('article', article);
+        data.append('quantity', quantity);
 
-            fetch(scriptURL, { method: 'POST', body: data })
-                .then(response => response.json())
-                .then(result => {
-                    alert('Дані успішно надіслано!');document.getElementById('product-form').style.display = 'none';
-                    document.getElementById('qr-reader').style.display = 'none';
-                })
-                .catch(error => {
-                    alert('Помилка при відправці даних.');
-                });
-        }
-    </script>
-</body>
-</html>
+        fetch(scriptURL, { method: 'POST', body: data })
+            .then(response => response.json())
+            .then(result => {
+                alert('Дані успішно надіслано!');
+                document.getElementById('product-form').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Помилка:', error);
+            });
+    }
+</script>
